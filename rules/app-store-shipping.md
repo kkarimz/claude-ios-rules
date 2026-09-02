@@ -1,6 +1,6 @@
 ---
 alwaysApply: false
-paths: **/Info.plist, **/project.yml, **/*.pbxproj, **/LISTING.md, **/docs/app-store/**
+paths: **/Info.plist, **/project.yml, **/*.pbxproj, **/*.entitlements, **/LISTING.md, **/docs/app-store/**, **/fastlane/**
 ---
 
 # App Store shipping (iOS and macOS)
@@ -21,7 +21,7 @@ Increment **build** for every upload. Increment **marketing version** when the t
 
 - Keep **`LISTING.md`** (or equivalent) as the source of truth for description, keywords, promotional text, and What's New.
 - Paste What's New from LISTING into App Store Connect; do not invent copy in chat without updating the file.
-- Follow `app-store-copy.md` for App Store strings.
+- Follow the **app-store-copy** rule for App Store strings.
 
 ## Screenshots
 
@@ -33,7 +33,8 @@ Increment **build** for every upload. Increment **marketing version** when the t
 
 - Archive with the correct scheme and signing team.
 - Validate entitlements match capabilities in Connect (iCloud, push, etc.).
-- Confirm privacy manifest and usage description strings if the app accesses protected APIs.
+- Confirm privacy manifest (`PrivacyInfo.xcprivacy`) and usage description strings if the app accesses protected APIs.
+- Set export compliance correctly (many apps: no custom encryption beyond HTTPS).
 - Run the app on the minimum supported OS version once before submission.
 
 ## Do not

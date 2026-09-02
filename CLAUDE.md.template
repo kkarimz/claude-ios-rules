@@ -1,9 +1,9 @@
 # iOS / macOS development
 
-Modular rules live in `.claude/rules/`. Path-scoped rules load when Claude reads matching files.
+Modular rules live in `.claude/rules/` (path-scoped) and `.claude/always/` (session defaults). Path-scoped rules load when Claude reads matching files.
 
 <!-- claude-ios-rules:start -->
-@.claude/rules/anti-overengineering.md
-@.claude/rules/agent-honesty.md
-@.claude/rules/agent-efficiency.md
+@.claude/always/anti-overengineering.md
+@.claude/always/agent-honesty.md
+@.claude/always/agent-efficiency.md
 <!-- claude-ios-rules:end -->

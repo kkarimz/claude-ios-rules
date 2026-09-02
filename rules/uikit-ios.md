@@ -1,6 +1,6 @@
 ---
 alwaysApply: false
-paths: **/ios/**/*.swift, **/*ViewController.swift, **/*ViewController+*.swift
+paths: **/*ViewController.swift, **/*ViewController+*.swift, **/ios/**/*.swift, **/UIKit/**/*.swift
 ---
 
 # UIKit (iOS)

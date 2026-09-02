@@ -4,12 +4,21 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 RULES_SRC="$REPO_ROOT/rules"
+ALWAYS_SRC="$REPO_ROOT/always"
 MARKER_START="<!-- claude-ios-rules:start -->"
 MARKER_END="<!-- claude-ios-rules:end -->"
-IMPORTS=$(cat <<'EOF'
-@.claude/rules/anti-overengineering.md
-@.claude/rules/agent-honesty.md
-@.claude/rules/agent-efficiency.md
+
+PROJECT_IMPORTS=$(cat <<'EOF'
+@.claude/always/anti-overengineering.md
+@.claude/always/agent-honesty.md
+@.claude/always/agent-efficiency.md
+EOF
+)
+
+USER_IMPORTS=$(cat <<'EOF'
+@always/anti-overengineering.md
+@always/agent-honesty.md
+@always/agent-efficiency.md
 EOF
 )
 
@@ -18,9 +27,9 @@ usage() {
 Usage: ./install.sh [target]
 
 Targets:
-  project   Install to ./.claude/rules/ and merge CLAUDE.md (default)
-  user      Install to ~/.claude/rules/ and merge ~/.claude/CLAUDE.md
-  link      Symlink rules into ./.claude/rules/
+  project   Install to ./.claude/ and merge CLAUDE.md (default)
+  user      Install to ~/.claude/ and merge ~/.claude/CLAUDE.md
+  link      Symlink rules into ./.claude/
 
 Examples:
   ./install.sh
@@ -31,8 +40,9 @@ EOF
 
 merge_claude_md() {
   local dest="$1"
+  local imports="$2"
   local block="${MARKER_START}
-${IMPORTS}
+${imports}
 ${MARKER_END}"
 
   if [[ -f "$dest" ]]; then
@@ -51,52 +61,71 @@ path.write_text(text)
 PY
       echo "updated $dest (replaced claude-ios-rules block)"
     else
-      printf '\n%s\n%s\n%s\n' "$MARKER_START" "$IMPORTS" "$MARKER_END" >> "$dest"
+      printf '\n%s\n%s\n%s\n' "$MARKER_START" "$imports" "$MARKER_END" >> "$dest"
       echo "appended claude-ios-rules imports to $dest"
     fi
   else
     mkdir -p "$(dirname "$dest")"
     cp "$REPO_ROOT/CLAUDE.md.template" "$dest"
+    python3 - "$dest" "$block" <<'PY'
+import pathlib, re, sys
+path = pathlib.Path(sys.argv[1])
+block = sys.argv[2]
+text = path.read_text()
+pattern = re.compile(r"<!-- claude-ios-rules:start -->.*?<!-- claude-ios-rules:end -->", re.S)
+text = pattern.sub(block, text)
+path.write_text(text)
+PY
     echo "created $dest from template"
   fi
 }
 
+install_rules() {
+  local rules_dest="$1"
+  local always_dest="$2"
+  mkdir -p "$rules_dest" "$always_dest"
+  cp -v "$RULES_SRC"/*.md "$rules_dest/"
+  cp -v "$ALWAYS_SRC"/*.md "$always_dest/"
+}
+
 TARGET="${1:-project}"
 
-if [[ ! -d "$RULES_SRC" ]]; then
-  echo "error: rules/ not found at $RULES_SRC" >&2
+if [[ ! -d "$RULES_SRC" || ! -d "$ALWAYS_SRC" ]]; then
+  echo "error: rules/ or always/ not found under $REPO_ROOT" >&2
   exit 1
 fi
 
 case "$TARGET" in
   project)
-    DEST_RULES="$(pwd)/.claude/rules"
-    mkdir -p "$DEST_RULES"
-    cp -v "$RULES_SRC"/*.md "$DEST_RULES/"
-    merge_claude_md "$(pwd)/CLAUDE.md"
+    install_rules "$(pwd)/.claude/rules" "$(pwd)/.claude/always"
+    merge_claude_md "$(pwd)/CLAUDE.md" "$PROJECT_IMPORTS"
     echo ""
-    echo "Installed $(ls -1 "$RULES_SRC"/*.md | wc -l | tr -d ' ') rules to $DEST_RULES"
-    echo "Commit .claude/rules/ and CLAUDE.md with your project for the team."
+    echo "Installed 5 path-scoped rules to .claude/rules/ and 3 always-on rules to .claude/always/"
+    echo "Commit .claude/ and CLAUDE.md with your project for the team."
     ;;
   user)
-    DEST_RULES="$HOME/.claude/rules"
-    mkdir -p "$DEST_RULES"
-    cp -v "$RULES_SRC"/*.md "$DEST_RULES/"
-    merge_claude_md "$HOME/.claude/CLAUDE.md"
+    install_rules "$HOME/.claude/rules" "$HOME/.claude/always"
+    merge_claude_md "$HOME/.claude/CLAUDE.md" "$USER_IMPORTS"
     echo ""
-    echo "Installed to $DEST_RULES (global on this machine)."
+    echo "Installed to ~/.claude/rules/ and ~/.claude/always/"
     ;;
   link)
-    DEST_RULES="$(pwd)/.claude/rules"
-    mkdir -p "$DEST_RULES"
+    RULES_DEST="$(pwd)/.claude/rules"
+    ALWAYS_DEST="$(pwd)/.claude/always"
+    mkdir -p "$RULES_DEST" "$ALWAYS_DEST"
     for f in "$RULES_SRC"/*.md; do
       name="$(basename "$f")"
-      ln -sf "$f" "$DEST_RULES/$name"
-      echo "linked $DEST_RULES/$name -> $f"
+      ln -sf "$f" "$RULES_DEST/$name"
+      echo "linked $RULES_DEST/$name -> $f"
     done
-    merge_claude_md "$(pwd)/CLAUDE.md"
+    for f in "$ALWAYS_SRC"/*.md; do
+      name="$(basename "$f")"
+      ln -sf "$f" "$ALWAYS_DEST/$name"
+      echo "linked $ALWAYS_DEST/$name -> $f"
+    done
+    merge_claude_md "$(pwd)/CLAUDE.md" "$PROJECT_IMPORTS"
     echo ""
-    echo "Symlinked rules into $DEST_RULES"
+    echo "Symlinked rules into .claude/rules/ and .claude/always/"
     ;;
   -h|--help|help)
     usage

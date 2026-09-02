@@ -40,5 +40,5 @@ If two widened searches add nothing new, stop and ask one focused question or re
 
 ## Does not override
 
-- App Store strings follow `app-store-copy.md`.
-- Scope and honesty follow `anti-overengineering.md` and `agent-honesty.md`.
+- App Store strings follow the **app-store-copy** rule.
+- Scope and honesty follow **anti-overengineering** and **agent-honesty**.

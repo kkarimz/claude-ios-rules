@@ -1,16 +1,18 @@
 ---
 alwaysApply: false
-paths: **/*.swift, **/Package.swift, **/project.yml, **/*.pbxproj
+paths: **/*.swift, **/Package.swift, **/Package.resolved, **/project.yml, **/*.pbxproj, **/*.entitlements
 ---
 
 # iOS / Swift (general)
 
 Match the repo's existing toolchain. Do not upgrade Swift, Xcode, or deployment targets unless asked.
 
+When SwiftUI or UIKit rules also apply to a file, follow those for view-layer code. This rule covers project wiring, models, services, and build config.
+
 ## Project layout
 
 - **SPM:** Dependencies in `Package.swift`. Prefer local packages for shared modules.
-- **XcodeGen:** If `project.yml` exists, edit YAML and regenerate; do not hand-edit `project.pbxproj` unless the project has no generator.
+- **XcodeGen:** If `project.yml` exists, edit YAML and run `xcodegen generate`; do not hand-edit `project.pbxproj` unless the project has no generator.
 - **Plain Xcode:** Edit the project through Xcode or documented scripts; keep `pbxproj` diffs minimal.
 
 ## Swift habits

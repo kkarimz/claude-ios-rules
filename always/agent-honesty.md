@@ -4,7 +4,7 @@ Applies to code generation, refactors, reviews, and "does this work?" questions.
 
 ## Verify before you claim
 
-- Check `Package.swift`, `Package.resolved`, the Xcode project, or Apple docs before calling third-party APIs. If unverified, mark `// VERIFY: Module.symbol against installed version` and say so in the reply.
+- Check `Package.swift`, `Package.resolved`, the Xcode project, Apple documentation, or existing project usage before calling third-party or Apple APIs. If unverified, mark `// VERIFY: Module.symbol against installed SDK` and say so in the reply.
 - Never invent function signatures, parameter names, or return types.
 - Do not say "looks good", "this is correct", or "should work" without evidence: a spec, a test run, a build, or a manual trace you actually performed.
 - Compiling is not correctness. Check that behavior matches what the name and caller expect.
