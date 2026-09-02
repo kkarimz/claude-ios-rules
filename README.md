@@ -21,7 +21,16 @@ Path-scoped rules use Claude's `paths:` frontmatter and load when Claude reads m
 
 ## Quick install
 
-### Option A: One project (recommended for teams)
+### Option A: Global (all projects on this Mac)
+
+```bash
+git clone https://github.com/kkarimz/claude-ios-rules.git
+claude-ios-rules/install.sh user
+```
+
+Installs to `~/.claude/rules/` and merges imports into `~/.claude/CLAUDE.md`.
+
+### Option B: One project (recommended for teams)
 
 ```bash
 git clone https://github.com/kkarimz/claude-ios-rules.git
@@ -30,15 +39,6 @@ cd YourApp
 ```
 
 This copies rules to `YourApp/.claude/rules/` and creates or updates `CLAUDE.md` with `@` imports for the always-on rules. Commit both with your project.
-
-### Option B: Global (all projects on this Mac)
-
-```bash
-git clone https://github.com/kkarimz/claude-ios-rules.git
-claude-ios-rules/install.sh user
-```
-
-Installs to `~/.claude/rules/` and merges imports into `~/.claude/CLAUDE.md`.
 
 ### Option C: Submodule + symlink
 
